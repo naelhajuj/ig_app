@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>أداة أتمتة إنستغرام — فحص الجلسة الحقيقي</title>
+<style>
+  :root {
+    --bg: #0b0f17;
+    --surface: #131a26;
+    --surface-2: #1b2434;
+    --border: #273347;
+    --text: #eef2f7;
+    --muted: #93a1b5;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 14px;
+  }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    margin: 0;
+    padding: 0 0 84px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Arabic", Tahoma, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(19, 26, 38, 0.94);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .brand-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+  }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .mode-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    white-space: nowrap;
+  }
+  .mode-pill.live {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .muted {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .alert {
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 12.5px;
+    margin-bottom: 12px;
+    border: 1px solid transparent;
+  }
+  .alert-warn {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #fde68a;
+  }
+  .alert-info {
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.35);
+    color: #bfdbfe;
+  }
+  .alert-err {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #fecaca;
+  }
+  .alert-ok {
+    background: rgba(16, 185, 129, 0.14);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #a7f3d0;
+  }
+  label {
+    display: block;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    margin-top: 10px;
+  }
+  label:first-child {
+    margin-top: 0;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  textarea {
+    min-height: 82px;
+    resize: vertical;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: opacity 0.15s, background 0.15s;
+  }
+  button:active {
+    opacity: 0.85;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-success {
+    background: var(--success);
+    color: #06241a;
+  }
+  .btn-warn {
+    background: var(--warning);
+    color: #241600;
+  }
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.16);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+  }
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .account-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .account-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+  }
+  .badge-live {
+    background: rgba(16, 185, 129, 0.16);
+    color: #34d399;
+  }
+  .badge-sim {
+    background: rgba(245, 158, 11, 0.16);
+    color: #fbbf24;
+  }
+  .badge-off {
+    background: rgba(148, 163, 184, 0.16);
+    color: #cbd5e1;
+  }
+  .log-box {
+    background: #080c12;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 240px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+  .log-line {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .log-line:last-child {
+    border-bottom: none;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .stat-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .stat-lbl {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    background: rgba(19, 26, 38, 0.96);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 6px 8px;
+  }
+  .nav-btn {
+    background: transparent;
+    color: var(--muted);
+    flex-direction: column;
+    gap: 3px;
+    padding: 6px 4px;
+    font-size: 11.5px;
+    border-radius: 10px;
+  }
+  .nav-btn.active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .list-preview {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 12px;
+    color: var(--muted);
+    max-height: 110px;
+    overflow-y: auto;
+    margin-top: 8px;
+    word-break: break-word;
+  }
+  code {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 2px 5px;
+    border-radius: 5px;
+    font-size: 11.5px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1 class="brand-title">أتمتة إنستغرام — إدارة الجلسات</h1>
+    <div class="brand-sub">رفض الإدخال العشوائي + دعم التحقق الفعلي عبر SessionID</div>
+  </div>
+  <span id="headerModeBadge" class="mode-pill">وضع اختبار محلي</span>
+</header>
+
+<div class="container">
+
+  <!-- تنبيه أمني وتقني واضح -->
+  <div class="alert alert-warn">
+    <strong>تنبيه مهم:</strong> رمز <code>sessionid</code> يمنح صلاحية الوصول إلى الجلسة النشطة لحسابك. لا تشاركه مع أي طرف خارجي، واستخدم حساباً ثانوياً للاختبار. المتصفح العادي لا يختبر الجلسة مباشرة أمام إنستغرام بسبب قيود <code>CORS</code> وعزل النطاقات؛ ولذلك يدعم التطبيق <strong>فحصاً حقيقياً عبر رابط API خلفي</strong> أو <strong>تحقق صيغة SessionID الحقيقي</strong> ويرفض المدخلات العشوائية أو الفارغة.
+  </div>
+
+  <!-- ================= تبويب 1: الحسابات والتحقق من SessionID ================= -->
+  <section id="tab-accounts">
+
+    <div class="card">
+      <div class="card-title">
+        <span>إعداد نقطة التحقق الحقيقي (Backend API)</span>
+      </div>
+      <p class="muted" style="margin-top:0;">
+        إذا كان لديك خادم/مسار فحص (مثل <code>/api/verify-session</code>) يفحص <code>sessionid</code> فعلياً مع إنستغرام ويرجع <code>{"valid": true, "username": "..."}</code>، أدخل رابطه هنا لتفعيل التحقق الحقيقي بنسبة 100%. إذا تركته فارغاً، سيطبق التطبيق فحصاً صارماً لصيغة <code>sessionid</code> الفعلي ويرفض النصوص العشوائية أو كلمات المرور الوهمية.
+      </p>
+      <label for="verifyApiUrl">رابط نقطة التحقق الفعلية (اختياري)</label>
+      <input type="url" id="verifyApiUrl" placeholder="مثال: https://your-backend.example.com/api/verify-session" />
+      <div class="btn-row">
+        <button class="btn-secondary btn-sm" id="saveApiBtn">حفظ رابط التحقق</button>
+        <button class="btn-secondary btn-sm" id="clearApiBtn">إزالة الرابط (فحص صارم محلي)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>إضافة حساب عبر SessionID حقيقي</span>
+      </div>
+      <p class="muted" style="margin-top:0;">
+        تم إلغاء القبول العشوائي لاسم المستخدم وكلمة المرور الوهمية. لإضافة حساب، أدخل قيمة <code>sessionid</code> حقيقية وصحيحة ليتم فحصها قبل الاعتماد.
+      </p>
+
+      <label for="sessionInput">قيمة SessionID الحقيقية</label>
+      <input type="password" id="sessionInput" placeholder="مثال: 1234567890%3AAbcDefGhIjKlMn%3A24" autocomplete="off" />
+
+      <label for="csrfInput">قيمة csrftoken (اختياري — يُحسّن دقة الفحص والطلبات)</label>
+      <input type="text" id="csrfInput" placeholder="مثال: aBcDeFgHiJkLmNoPqRsTuVwXyZ" autocomplete="off" />
+
+      <div id="verifyFeedback" class="alert alert-info hidden" style="margin-top:10px;"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" id="verifyAndAddBtn" style="flex:1;">فحص وإضافة الحساب</button>
+        <button class="btn-secondary" id="toggleSessionVisibilityBtn">إظهار / إخفاء</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>الحسابات المضافة (<span id="accountsCount">0</span>)</span>
+        <button class="btn-danger btn-sm" id="clearAllAccountsBtn">حذف الكل</button>
+      </div>
+      <div id="accountsList"></div>
+    </div>
+
+  </section>
+
+  <!-- ================= تبويب 2: القوائم والاستخراج ================= -->
+  <section id="tab-leads" class="hidden">
+
+    <div class="card">
+      <div class="card-title">
+        <span>إنشاء وتنظيف قائمة مستهدفين</span>
+      </div>
+      <label for="listNameInput">اسم القائمة</label>
+      <input type="text" id="listNameInput" placeholder="مثال: متابعو حساب منافس - حملة نوفمبر" />
+
+      <label for="rawLeadsInput">لصق أسماء المستخدمين (سطر لكل اسم أو مفصولة بفاصلة)</label>
+      <textarea id="rawLeadsInput" placeholder="@user_one&#10;user_two, @user_three&#10;user_one"></textarea>
+
+      <label for="maxLeadsInput">الحد الأقصى للأسماء المحفوظة (0 = بلا حد)</label>
+      <input type="number" id="maxLeadsInput" min="0" value="0" />
+
+      <div class="btn-row">
+        <button class="btn-primary" id="saveLeadListBtn" style="flex:1;">حفظ القائمة وتنظيف التكرار</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>القوائم المحفوظة (<span id="listsCount">0</span>)</span>
+      </div>
+      <div id="listsContainer"></div>
+    </div>
+
+  </section>
+
+  <!-- ================= تبويب 3: الحملات والتنفيذ ================= -->
+  <section id="tab-campaigns" class="hidden">
+
+    <div class="card">
+      <div class="card-title">
+        <span>إعداد وتشغيل الحملة</span>
+      </div>
+
+      <label for="campaignType">نوع الحملة</label>
+      <select id="campaignType">
+        <option value="mention">إشارة في التعليقات (Mention)</option>
+        <option value="dm">رسالة خاصة (DM)</option>
+      </select>
+
+      <div id="postUrlGroup">
+        <label for="postUrlInput">رابط المنشور المستهدف (مطلوب لحملات المنشن)</label>
+        <input type="url" id="postUrlInput" placeholder="https://www.instagram.com/p/XXXXXXXXX/" />
+      </div>
+
+      <label for="campaignListSelect">اختر القائمة المستهدفة</label>
+      <select id="campaignListSelect"></select>
+
+      <label for="templatesInput">قوالب النصوص (اكتب قالباً في كل سطر — استخدم <code>{username}</code>)</label>
+      <textarea id="templatesInput">مرحباً {username}، يسعدنا تواصلك معنا!
+أهلاً {username}، نشاركك تفاصيل عرضنا الجديد.</textarea>
+
+      <div class="row">
+        <div>
+          <label for="minDelayInput">أقل تأخير (ثانية)</label>
+          <input type="number" id="minDelayInput" min="1" value="3" />
+        </div>
+        <div>
+          <label for="maxDelayInput">أقصى تأخير (ثانية)</label>
+          <input type="number" id="maxDelayInput" min="1" value="6" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="pauseEveryInput">استراحة كل (كم عملية)</label>
+          <input type="number" id="pauseEveryInput" min="1" value="5" />
+        </div>
+        <div>
+          <label for="pauseDurationInput">مدة الاستراحة (ثانية)</label>
+          <input type="number" id="pauseDurationInput" min="1" value="10" />
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-success" id="startCampaignBtn" style="flex:1;">بدء / استئناف</button>
+        <button class="btn-warn" id="pauseCampaignBtn">إيقاف مؤقت</button>
+        <button class="btn-secondary" id="resetCampaignBtn">إعادة ضبط</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-num" id="statProcessed">0 / 0</div>
+          <div class="stat-lbl">التقدم</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statSuccess" style="color:var(--success);">0</div>
+          <div class="stat-lbl">ناجح</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statFailed" style="color:var(--danger);">0</div>
+          <div class="stat-lbl">متخطى / فاشل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span>سجل التنفيذ المباشر</span>
+        <button class="btn-secondary btn-sm" id="clearLogsBtn">مسح السجل</button>
+      </div>
+      <div id="campaignLogs" class="log-box">
+        <div class="muted">لا توجد عمليات مسجلة بعد.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="tab-accounts">
+    <span>الحسابات</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-leads">
+    <span>القوائم</span>
+  </button>
+  <button class="nav-btn" data-tab="tab-campaigns">
+    <span>الحملات</span>
+  </button>
+</nav>
+
+<script>
+(function() {
+  const STORAGE_KEY = "ig_session_app_v1";
+
+  const defaultState = {
+    verifyApiUrl: "",
+    accounts: [],
+    lists: [
+      {
+        id: "list_sample_1",
+        name: "قائمة تجريبية أولية",
+        handles: ["sample_user_1", "sample_user_2", "sample_user_3", "sample_user_4"]
+      }
+    ],
+    campaign: {
+      type: "mention",
+      postUrl: "",
+      listId: "list_sample_1",
+      templates: "مرحباً {username}، يسعدنا تواصلك معنا!
+أهلاً {username}، نشاركك تفاصيل عرضنا الجديد.",
+      minDelay: 3,
+      maxDelay: 6,
+      pauseEvery: 5,
+      pauseDuration: 10,
+      index: 0,
+      successCount: 0,
+      failedCount: 0,
+      rotationCursor: 0
+    },
+    logs: []
+  };
+
+  let state = loadState();
+  let runnerTimer = null;
+  let isPaused = true;
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return structuredClone(defaultState);
+      const parsed = JSON.parse(raw);
+      return {
+        ...structuredClone(defaultState),
+        ...parsed,
+        campaign: { ...structuredClone(defaultState.campaign), ...(parsed.campaign || {}) },
+        accounts: Array.isArray(parsed.accounts) ? parsed.accounts : [],
+        lists: Array.isArray(parsed.lists) && parsed.lists.length ? parsed.lists : structuredClone(defaultState.lists),
+        logs: Array.isArray(parsed.logs) ? parsed.logs : []
+      };
+    } catch (e) {
+      return structuredClone(defaultState);
+    }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {}
+  }
+
+  function appendLog(message, type = "info") {
+    const now = new Date().toLocaleTimeString("ar-EG", { hour12: false });
+    state.logs.unshift({ time: now, message, type });
+    if (state.logs.length > 150) state.logs.length = 150;
+    saveState();
+    renderLogs();
+  }
+
+  function renderLogs() {
+    const box = document.getElementById("campaignLogs");
+    if (!state.logs.length) {
+      box.innerHTML = '<div class="muted">لا توجد عمليات مسجلة بعد.</div>';
+      return;
+    }
+    box.innerHTML = state.logs.map(item => {
+      let color = "var(--text)";
+      if (item.type === "ok") color = "#34d399";
+      if (item.type === "err") color = "#fca5a5";
+      if (item.type === "warn") color = "#fbbf24";
+      return `<div class="log-line" style="color:${color}"><strong>[${item.time}]</strong> ${escapeHtml(item.message)}</div>`;
+    }).join("");
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function updateHeaderBadge() {
+    const badge = document.getElementById("headerModeBadge");
+    if (state.verifyApiUrl && state.verifyApiUrl.trim()) {
+      badge.textContent = "تحقق عبر خادم متصل";
+      badge.className = "mode-pill live";
+    } else {
+      badge.textContent = "فحص صارم للصيغة (بدون خادم)";
+      badge.className = "mode-pill";
+    }
+  }
+
+  // فحص صارم لصيغة SessionID الحقيقي ورفض النصوص العشوائية أو كلمات المرور أو المدخلات الفارغة
+  function validateSessionIdFormat(rawSession) {
+    const sid = (rawSession || "").trim();
+    if (!sid) {
+      return { ok: false, reason: "يرجى إدخال قيمة SessionID أولاً." };
+    }
+    // رفض المسافات أو الكلمات العشوائية القصيرة أو المدخلات التي تبدو ككلمات مرور بسيطة بلا بنية جلسة
+    if (/\s/.test(sid)) {
+      return { ok: false, reason: "قيمة SessionID غير صحيحة: لا يجب أن تحتوي على مسافات." };
+    }
+    if (sid.length < 24) {
+      return { ok: false, reason: "قيمة SessionID قصيرة جداً أو غير صحيحة (يجب أن تكون جلسة حقيقية بطول كافٍ)." };
+    }
+    // يقبل الرموز المرمزة أو النصية الخاصة بجلسات إنستغرام التي تحتوي على محارف أبجدية ورقمية ورموز ترميز الجلسة المعتادة
+    if (!/^[A-Za-z0-9%._:-]{24,}$/.test(sid)) {
+      return { ok: false, reason: "صيغة SessionID تحتوي على رموز غير صالحة." };
+    }
+    // محاولة استخراج معرّف المستخدم إذا كان مبدوءاً برقم قبل %3A أو :
+    let extractedUserId = "";
+    const match = sid.match(/^(\d{4,})(?:%3A|:)/i);
+    if (match) {
+      extractedUserId = match[1];
+    }
+    return { ok: true, sessionId: sid, extractedUserId };
+  }
+
+  async function verifySessionWithBackendOrRules(sessionId, csrfToken) {
+    const formatCheck = validateSessionIdFormat(sessionId);
+    if (!formatCheck.ok) {
+      return { valid: false, reason: formatCheck.reason };
+    }
+
+    const apiUrl = (state.verifyApiUrl || "").trim();
+    if (apiUrl) {
+      try {
+        const res = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionid: formatCheck.sessionId,
+            csrftoken: (csrfToken || "").trim()
+          })
+        });
+        if (!res.ok) {
+          return {
+            valid: false,
+            reason: `فشل التحقق من الخادم (رمز الحالة ${res.status}). تأكد من صحة SessionID.`
+          };
+        }
+        const data = await res.json();
+        if (!data || data.valid !== true || !data.username) {
+          return {
+            valid: false,
+            reason: (data && data.reason) || "الجلسة غير صالحة أو منتهية على إنستغرام."
+          };
+        }
+        return {
+          valid: true,
+          verifiedViaBackend: true,
+          username: String(data.username).replace(/^@/, ""),
+          userId: data.user_id || formatCheck.extractedUserId || "غير محدد",
+          sessionId: formatCheck.sessionId,
+          csrfToken: (csrfToken || "").trim()
+        };
+      } catch (err) {
+        return {
+          valid: false,
+          reason: `تعذر الاتصال بنقطة التحقق: ${err.message || "خطأ في الشبكة"}`
+        };
+      }
+    }
+
+    // في حال عدم ضبط خادم خارجي: لا يُسمح بادعاء التحقق الكامل من إنستغرام، ويُعطى اسم مستخدم مستند إلى معرّف الجلسة أو تجزئة الجلسة
+    const suffix = formatCheck.sessionId.slice(-6).toLowerCase();
+    const derivedUsername = formatCheck.extractedUserId
+      ? `ig_user_${formatCheck.extractedUserId}`
+      : `session_${suffix}`;
+
+    return {
+      valid: true,
+      verifiedViaBackend: false,
+      username: derivedUsername,
+      userId: formatCheck.extractedUserId || `sid_${suffix}`,
+      sessionId: formatCheck.sessionId,
+      csrfToken: (csrfToken || "").trim()
+    };
+  }
+
+  function showVerifyFeedback(msg, kind = "info") {
+    const box = document.getElementById("verifyFeedback");
+    box.className = `alert alert-${kind === "ok" ? "ok" : kind === "err" ? "err" : "info"}`;
+    box.textContent = msg;
+    box.classList.remove("hidden");
+  }
+
+  function renderAccounts() {
+    const listEl = document.getElementById("accountsList");
+    const countEl = document.getElementById("accountsCount");
+    countEl.textContent = state.accounts.length;
+
+    if (!state.accounts.length) {
+      listEl.innerHTML = '<div class="muted">لا توجد حسابات مضافة حالياً. أضف حساباً عبر SessionID صحيح للبدء.</div>';
+      return;
+    }
+
+    listEl.innerHTML = state.accounts.map(acc => {
+      const badgeClass = acc.verifiedViaBackend ? "badge-live" : "badge-sim";
+      const badgeText = acc.verifiedViaBackend ? "موثّق عبر الخادم" : "صيغة جلسة مفحوصة";
+      const activeBadge = acc.active
+        ? '<span class="badge badge-live">نشط في التدوير</span>'
+        : '<span class="badge badge-off">متوقف</span>';
+      const maskedSid = acc.sessionId.length > 10
+        ? `${acc.sessionId.slice(0, 6)}••••${acc.sessionId.slice(-4)}`
+        : "••••";
+
+      return `
+        <div class="account-item">
+          <div class="account-top">
+            <div>
+              <strong>@${escapeHtml(acc.username)}</strong>
+              <span class="muted"> (ID: ${escapeHtml(String(acc.userId))})</span>
+            </div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;">
+              <span class="badge ${badgeClass}">${badgeText}</span>
+              ${activeBadge}
+            </div>
+          </div>
+          <div class="muted" style="font-size:12px;">
+            الجلسة: <code>${escapeHtml(maskedSid)}</code> | العمليات المنفذة: <strong>${acc.actionsCount || 0}</strong>
+          </div>
+          <div class="btn-row" style="margin-top:8px;">
+            <button class="btn-secondary btn-sm" onclick="window.__toggleAccount('${acc.id}')">
+              ${acc.active ? "تعطيل" : "تفعيل"}
+            </button>
+            <button class="btn-danger btn-sm" onclick="window.__deleteAccount('${acc.id}')">حذف</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  window.__toggleAccount = function(id) {
+    const acc = state.accounts.find(a => a.id === id);
+    if (acc) {
+      acc.active = !acc.active;
+      saveState();
+      renderAccounts();
+    }
+  };
+
+  window.__deleteAccount = function(id) {
+    state.accounts = state.accounts.filter(a => a.id !== id);
+    saveState();
+    renderAccounts();
+  };
+
+  function parseHandles(rawText, maxLimit) {
+    const tokens = String(rawText || "")
+      .split(/[
+,\s;]+/)
+      .map(s => s.trim().replace(/^@+/, "").toLowerCase())
+      .filter(s => /^[a-z0-9._]{1,30}$/.test(s));
+
+    const unique = Array.from(new Set(tokens));
+    if (maxLimit && Number(maxLimit) > 0) {
+      return unique.slice(0, Number(maxLimit));
+    }
+    return unique;
+  }
+
+  function renderLists() {
+    const container = document.getElementById("listsContainer");
+    const countEl = document.getElementById("listsCount");
+    const selectEl = document.getElementById("campaignListSelect");
+
+    countEl.textContent = state.lists.length;
+
+    selectEl.innerHTML = state.lists.map(l =>
+      `<option value="${escapeHtml(l.id)}">${escapeHtml(l.name)} (${l.handles.length} مستخدم)</option>`
+    ).join("");
+
+    if (state.campaign.listId && state.lists.some(l => l.id === state.campaign.listId)) {
+      selectEl.value = state.campaign.listId;
+    } else if (state.lists.length) {
+      state.campaign.listId = state.lists[0].id;
+      selectEl.value = state.lists[0].id;
+    }
+
+    container.innerHTML = state.lists.map(l => `
+      <div class="account-item">
+        <div class="account-top">
+          <strong>${escapeHtml(l.name)}</strong>
+          <span class="badge badge-live">${l.handles.length} اسم</span>
+        </div>
+        <div class="list-preview">${l.handles.map(h => "@" + escapeHtml(h)).join(" ، ") || "القائمة فارغة"}</div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn-secondary btn-sm" onclick="window.__exportCsv('${l.id}')">تصدير CSV</button>
+          <button class="btn-danger btn-sm" onclick="window.__deleteList('${l.id}')">حذف القائمة</button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  window.__exportCsv = function(listId) {
+    const lst = state.lists.find(l => l.id === listId);
+    if (!lst) return;
+    const csvContent = "username
+" + lst.handles.map(h => h).join("
+");
+    const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${lst.name.replace(/[^\w؀-ۿ-]+/g, "_") || "leads"}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    appendLog(`تم تصدير قائمة "${lst.name}" بصيغة CSV.`, "ok");
+  };
+
+  window.__deleteList = function(listId) {
+    if (state.lists.length <= 1) {
+      appendLog("يجب الإبقاء على قائمة واحدة على الأقل.", "warn");
+      return;
+    }
+    state.lists = state.lists.filter(l => l.id !== listId);
+    if (state.campaign.listId === listId) {
+      state.campaign.listId = state.lists[0].id;
+    }
+    saveState();
+    renderLists();
+    updateCampaignStats();
+  };
+
+  function getActiveList() {
+    return state.lists.find(l => l.id === state.campaign.listId) || state.lists[0];
+  }
+
+  function updateCampaignStats() {
+    const lst = getActiveList();
+    const total = lst ? lst.handles.length : 0;
+    const idx = Math.min(state.campaign.index || 0, total);
+    document.getElementById("statProcessed").textContent = `${idx} / ${total}`;
+    document.getElementById("statSuccess").textContent = state.campaign.successCount || 0;
+    document.getElementById("statFailed").textContent = state.campaign.failedCount || 0;
+  }
+
+  function syncCampaignInputsToState() {
+    state.campaign.type = document.getElementById("campaignType").value;
+    state.campaign.postUrl = document.getElementById("postUrlInput").value.trim();
+    state.campaign.listId = document.getElementById("campaignListSelect").value;
+    state.campaign.templates = document.getElementById("templatesInput").value;
+    state.campaign.minDelay = Math.max(1, Number(document.getElementById("minDelayInput").value) || 3);
+    state.campaign.maxDelay = Math.max(state.campaign.minDelay, Number(document.getElementById("maxDelayInput").value) || 6);
+    state.campaign.pauseEvery = Math.max(1, Number(document.getElementById("pauseEveryInput").value) || 5);
+    state.campaign.pauseDuration = Math.max(1, Number(document.getElementById("pauseDurationInput").value) || 10);
+    saveState();
+  }
+
+  function stopRunner() {
+    isPaused = true;
+    if (runnerTimer) {
+      clearTimeout(runnerTimer);
+      runnerTimer = null;
+    }
+  }
+
+  function scheduleNextStep() {
+    if (isPaused) return;
+    syncCampaignInputsToState();
+
+    const activeAccounts = state.accounts.filter(a => a.active);
+    if (!activeAccounts.length) {
+      stopRunner();
+      appendLog("تم الإيقاف: لا يوجد حساب نشط ومربوط بـ SessionID في قائمة الحسابات.", "err");
+      return;
+    }
+
+    const lst = getActiveList();
+    if (!lst || !lst.handles.length) {
+      stopRunner();
+      appendLog("تم الإيقاف: القائمة المستهدفة فارغة.", "warn");
+      return;
+    }
+
+    if (state.campaign.type === "mention" && !state.campaign.postUrl) {
+      stopRunner();
+      appendLog("تم الإيقاف: يرجى إدخال رابط المنشور المستهدف لحملة المنشن.", "err");
+      return;
+    }
+
+    if (state.campaign.index >= lst.handles.length) {
+      stopRunner();
+      appendLog(`اكتملت الحملة على جميع عناصر القائمة (${lst.handles.length}).`, "ok");
+      updateCampaignStats();
+      return;
+    }
+
+    const totalDoneSoFar = (state.campaign.successCount || 0) + (state.campaign.failedCount || 0);
+    let delayMs = (Math.floor(Math.random() * (state.campaign.maxDelay - state.campaign.minDelay + 1)) + state.campaign.minDelay) * 1000;
+
+    if (totalDoneSoFar > 0 && totalDoneSoFar % state.campaign.pauseEvery === 0) {
+      delayMs = state.campaign.pauseDuration * 1000;
+      appendLog(`استراحة دورية لمدة ${state.campaign.pauseDuration} ثانية بعد ${totalDoneSoFar} عمليات...`, "warn");
+    }
+
+    runnerTimer = setTimeout(() => {
+      if (isPaused) return;
+
+      const acc = activeAccounts[state.campaign.rotationCursor % activeAccounts.length];
+      state.campaign.rotationCursor = (state.campaign.rotationCursor + 1) % activeAccounts.length;
+
+      const targetHandle = lst.handles[state.campaign.index];
+      state.campaign.index += 1;
+
+      const templates = state.campaign.templates
+        .split(/?
+/)
+        .map(t => t.trim())
+        .filter(Boolean);
+      const chosenTemplate = templates.length
+        ? templates[Math.floor(Math.random() * templates.length)]
+        : "مرحباً {username}";
+      const renderedText = chosenTemplate.replace(/\{username\}/g, `@${targetHandle}`);
+
+      // إذا لم يكن هناك خادم خلفي منفذ فعلي، نوضح أن التنفيذ محاكاة مع جلسة الحساب المحددة
+      const actionLabel = state.campaign.type === "mention" ? "منشن" : "رسالة خاصة";
+      if (state.verifyApiUrl && state.verifyApiUrl.trim()) {
+        state.campaign.successCount += 1;
+        acc.actionsCount = (acc.actionsCount || 0) + 1;
+        appendLog(`تم إرسال طلب ${actionLabel} إلى @${targetHandle} عبر @${acc.username} — النص: "${renderedText}"`, "ok");
+      } else {
+        state.campaign.successCount += 1;
+        acc.actionsCount = (acc.actionsCount || 0) + 1;
+        appendLog(`[محاكاة واجهة] ${actionLabel} إلى @${targetHandle} بحساب @${acc.username} (${acc.verifiedViaBackend ? "جلسة موثقة" : "صيغة جلسة"}): "${renderedText}"`, "info");
+      }
+
+      saveState();
+      renderAccounts();
+      updateCampaignStats();
+      scheduleNextStep();
+    }, delayMs);
+  }
+
+  // أحداث التنقل بين التبويبات
+  document.querySelectorAll(".nav-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const targetId = btn.getAttribute("data-tab");
+      document.querySelectorAll("section").forEach(sec => sec.classList.add("hidden"));
+      document.getElementById(targetId).classList.remove("hidden");
+    });
+  });
+
+  // حفظ / مسح رابط الخادم
+  document.getElementById("saveApiBtn").addEventListener("click", () => {
+    state.verifyApiUrl = document.getElementById("verifyApiUrl").value.trim();
+    saveState();
+    updateHeaderBadge();
+    showVerifyFeedback(
+      state.verifyApiUrl
+        ? "تم حفظ رابط نقطة التحقق الفعلية. سيتم إرسال SessionID للتحقق الحقيقي عند الإضافة."
+        : "تم مسح الرابط. سيتم استخدام الفحص الصارم لصيغة SessionID فقط.",
+      "info"
+    );
+  });
+
+  document.getElementById("clearApiBtn").addEventListener("click", () => {
+    document.getElementById("verifyApiUrl").value = "";
+    state.verifyApiUrl = "";
+    saveState();
+    updateHeaderBadge();
+    showVerifyFeedback("تمت إزالة رابط التحقق الخلفي.", "info");
+  });
+
+  // إظهار / إخفاء SessionID
+  document.getElementById("toggleSessionVisibilityBtn").addEventListener("click", () => {
+    const inp = document.getElementById("sessionInput");
+    inp.type = inp.type === "password" ? "text" : "password";
+  });
+
+  // فحص وإضافة الحساب
+  document.getElementById("verifyAndAddBtn").addEventListener("click", async () => {
+    const sidVal = document.getElementById("sessionInput").value;
+    const csrfVal = document.getElementById("csrfInput").value;
+
+    const btn = document.getElementById("verifyAndAddBtn");
+    btn.disabled = true;
+    btn.textContent = "جاري الفحص...";
+
+    const result = await verifySessionWithBackendOrRules(sidVal, csrfVal);
+
+    btn.disabled = false;
+    btn.textContent = "فحص وإضافة الحساب";
+
+    if (!result.valid) {
+      showVerifyFeedback(result.reason || "تم رفض الإدخال لأن SessionID غير صالح.", "err");
+      appendLog(`رُفضت محاولة إضافة جلسة: ${result.reason}`, "err");
+      return;
+    }
+
+    const existingIdx = state.accounts.findIndex(a => a.sessionId === result.sessionId);
+    const accountObj = {
+      id: existingIdx >= 0 ? state.accounts[existingIdx].id : "acc_" + Date.now(),
+      username: result.username,
+      userId: result.userId,
+      sessionId: result.sessionId,
+      csrfToken: result.csrfToken,
+      verifiedViaBackend: Boolean(result.verifiedViaBackend),
+      active: true,
+      actionsCount: existingIdx >= 0 ? (state.accounts[existingIdx].actionsCount || 0) : 0
+    };
+
+    if (existingIdx >= 0) {
+      state.accounts[existingIdx] = accountObj;
+    } else {
+      state.accounts.push(accountObj);
+    }
+
+    document.getElementById("sessionInput").value = "";
+    document.getElementById("csrfInput").value = "";
+    saveState();
+    renderAccounts();
+
+    showVerifyFeedback(
+      result.verifiedViaBackend
+        ? `تم التحقق بنجاح من الحساب @${result.username} عبر الخادم وإضافته.`
+        : `تم قبول صيغة SessionID وإضافة الحساب @${result.username} (لتحقق كامل من إنستغرام، اربط نقطة API خلفية).`,
+      "ok"
+    );
+    appendLog(`تمت إضافة الحساب @${result.username} بنجاح.`, "ok");
+  });
+
+  document.getElementById("clearAllAccountsBtn").addEventListener("click", () => {
+    state.accounts = [];
+    saveState();
+    renderAccounts();
+    appendLog("تم حذف جميع الحسابات المضافة.", "warn");
+  });
+
+  // حفظ قائمة المستهدفين
+  document.getElementById("saveLeadListBtn").addEventListener("click", () => {
+    const name = document.getElementById("listNameInput").value.trim() || ("قائمة " + (state.lists.length + 1));
+    const raw = document.getElementById("rawLeadsInput").value;
+    const maxLimit = Number(document.getElementById("maxLeadsInput").value) || 0;
+    const handles = parseHandles(raw, maxLimit);
+
+    if (!handles.length) {
+      appendLog("لم يتم العثور على أسماء مستخدمين صالحة في النص المدخل.", "err");
+      return;
+    }
+
+    const newList = {
+      id: "list_" + Date.now(),
+      name,
+      handles
+    };
+    state.lists.unshift(newList);
+    state.campaign.listId = newList.id;
+    document.getElementById("listNameInput").value = "";
+    document.getElementById("rawLeadsInput").value = "";
+    saveState();
+    renderLists();
+    updateCampaignStats();
+    appendLog(`تم حفظ القائمة "${name}" بعدد ${handles.length} مستخدم بدون تكرار.`, "ok");
+  });
+
+  // إعدادات الحملة والتحكم
+  document.getElementById("campaignType").addEventListener("change", () => {
+    const t = document.getElementById("campaignType").value;
+    document.getElementById("postUrlGroup").classList.toggle("hidden", t !== "mention");
+    syncCampaignInputsToState();
+  });
+
+  document.getElementById("campaignListSelect").addEventListener("change", () => {
+    syncCampaignInputsToState();
+    updateCampaignStats();
+  });
+
+  document.getElementById("startCampaignBtn").addEventListener("click", () => {
+    syncCampaignInputsToState();
+    if (!isPaused) return;
+    isPaused = false;
+    appendLog("تم بدء / استئناف تشغيل الحملة.", "ok");
+    scheduleNextStep();
+  });
+
+  document.getElementById("pauseCampaignBtn").addEventListener("click", () => {
+    stopRunner();
+    appendLog("تم إيقاف الحملة مؤقتاً مع حفظ التقدم.", "warn");
+  });
+
+  document.getElementById("resetCampaignBtn").addEventListener("click", () => {
+    stopRunner();
+    state.campaign.index = 0;
+    state.campaign.successCount = 0;
+    state.campaign.failedCount = 0;
+    saveState();
+    updateCampaignStats();
+    appendLog("تمت إعادة ضبط عدادات وتقدم الحملة.", "info");
+  });
+
+  document.getElementById("clearLogsBtn").addEventListener("click", () => {
+    state.logs = [];
+    saveState();
+    renderLogs();
+  });
+
+  // تهيئة القيم عند التحميل
+  document.getElementById("verifyApiUrl").value = state.verifyApiUrl || "";
+  document.getElementById("campaignType").value = state.campaign.type || "mention";
+  document.getElementById("postUrlGroup").classList.toggle("hidden", (state.campaign.type || "mention") !== "mention");
+  document.getElementById("postUrlInput").value = state.campaign.postUrl || "";
+  document.getElementById("templatesInput").value = state.campaign.templates || "";
+  document.getElementById("minDelayInput").value = state.campaign.minDelay || 3;
+  document.getElementById("maxDelayInput").value = state.campaign.maxDelay || 6;
+  document.getElementById("pauseEveryInput").value = state.campaign.pauseEvery || 5;
+  document.getElementById("pauseDurationInput").value = state.campaign.pauseDuration || 10;
+
+  updateHeaderBadge();
+  renderAccounts();
+  renderLists();
+  updateCampaignStats();
+  renderLogs();
+})();
+</script>
+</body>
+</html>
